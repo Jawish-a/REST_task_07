@@ -5,19 +5,23 @@ from datetime import datetime
 from .models import Flight, Booking
 from .serializers import FlightSerializer, BookingSerializer, BookingDetailsSerializer, UpdateBookingSerializer, RegisterSerializer, AdminUpdateBookingSerializer
 from .permissions import IsBookingOwner, IsChangable
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 class FlightsList(ListAPIView):
 	queryset = Flight.objects.all()
 	serializer_class = FlightSerializer
+	filter_backends = [SearchFilter, OrderingFilter]
+	search_fields = ['destination', ]
 
 
 class BookingsList(ListAPIView):
 	serializer_class = BookingSerializer
 	permission_classes = [IsAuthenticated]
-
 	def get_queryset(self):
 		return Booking.objects.filter(user=self.request.user, date__gte=datetime.today())
+
+
 
 
 class BookingDetails(RetrieveAPIView):
